@@ -20,7 +20,7 @@ namespace APICatalogo.Controllers
         //Action result permite que o tipo de retorno seja alterado, caso produtos seja null retorna 'NotFound()'
         public ActionResult<IEnumerable<Produto>> Get()
         {
-            var produtos = _context.Produtos.ToList();
+            var produtos = _context.Produtos.AsNoTracking().ToList();
             if(produtos is null)
             {
                 return NotFound("Produtos não encontrados");
@@ -65,6 +65,21 @@ namespace APICatalogo.Controllers
             _context.Entry(produto).State = EntityState.Modified;
             _context.SaveChanges();
 
+            return Ok(produto);
+        }
+
+
+        [HttpDelete("{id:int}")]
+        public ActionResult Delete(int id)
+        {
+            var produto = _context.Produtos.FirstOrDefault(p => p.ProdutoId == id);
+
+            if(produto is null)
+            {
+                return NotFound("Produto não encontrado");
+            }
+            _context.Produtos.Remove(produto);
+            _context.SaveChanges();
             return Ok(produto);
         }
     }
